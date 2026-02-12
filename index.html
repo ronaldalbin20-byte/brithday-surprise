@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise for Krisha</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #ffe4e1; text-align: center; margin: 0; padding: 0; }
+        .hidden { display: none; }
+        
+        /* Login Section */
+        #login-page { margin-top: 150px; }
+        input { padding: 12px; border-radius: 8px; border: 2px solid #ff69b4; width: 220px; outline: none; font-size: 16px; }
+        button { padding: 12px 25px; background: #ff69b4; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        button:hover { background: #d63384; }
+        
+        /* Cake & Candle Section */
+        .cake { position: relative; width: 120px; height: 90px; background: #f9d9d3; margin: 80px auto; border-radius: 10px 10px 0 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .candle { position: absolute; width: 10px; height: 35px; background: #ff69b4; top: -35px; left: 55px; border-radius: 3px; }
+        .flame { position: absolute; width: 12px; height: 18px; background: orange; border-radius: 50%; top: -18px; left: -1px; animation: flicker 0.1s infinite alternate; box-shadow: 0 0 10px orange; }
+        @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.2); } }
+        .extinguished { display: none; }
+
+        /* Wishes Section */
+        #final-page { padding: 20px; }
+        .wish-box { background: white; padding: 30px; border-radius: 20px; display: inline-block; margin-top: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 85%; border: 2px solid #ffb6c1; }
+        p { font-size: 18px; line-height: 1.6; color: #444; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    
+
+    <div id="login-page">
+        <h2 style="color: #d63384;">Secret Access Code ❤️</h2>
+        <input type="password" id="pass" placeholder="Password daalo...">
+        <br>
+        <button onclick="checkLogin()">Unlock Surprise</button>
+    </div>
+
+    <div id="wish-page" class="hidden">
+        <h1 style="color: #ff69b4; margin-top: 50px;">Happy Birthday Pyari! ❤️</h1>
+        <div class="cake">
+            <div class="candle"><div class="flame" id="flame"></div></div>
+        </div>
+        <p id="instruction" style="font-weight: bold; color: #d63384;">Ab mic mein zor se phook maariye! 🌬️</p>
+        <button id="next-btn" class="hidden" onclick="showFinalWishes()" style="background: #4CAF50;">Padhein Meri Wishes ✨</button>
+    </div>
+
+    <div id="final-page" class="hidden">
+        <div class="wish-box">
+            <h2 style="color: #ff69b4; margin-bottom: 20px;">Happy Birthday, Krisha! ❤️</h2>
+            
+            <p>Happy birthday dear Krisha! God bless you. May this year bring you a lot of happiness, success, and blessings. You're the best of the best partner in the world!</p>
+
+            <p>Woh din yaad hai jab hum mile? Humne saath mein <b>puchka</b> khaya tha, aur phir usi ke saath meri life ka woh khoobsurat panna likhna shuru hua jisme hum tumhari smile ke saath hi tumhare pyar mein pad gaye. ❤️</p>
+
+            <p>Tum meri choti si dunia ka woh suraj ho jiske saath mere din ki shruwat hoti hai, aur thik waise hi meri chaand ho jise dekh kar main chain ki nind sota hoon. 🌙</p>
+
+            <p>Tum mere liye sab kuch ho, meri woh daulat ho jo mujhe saato janm chahiye. Tum hamesha khush raho, khilkhilati raho aur tum par bhagwan ki kripa bani rahe.</p>
+
+            <h3 style="color: #ff69b4; margin-top: 25px; font-size: 22px;">I love you baby, I loveeeeeee you soooooooo much! 💖</h3>
+        </div>
+    </div>
+
+    <script>
+        function checkLogin() {
+            let passInput = document.getElementById('pass').value;
+            // Aapka saved password check ho raha hai
+            if(passInput === "13022005") { 
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('wish-page').classList.remove('hidden');
+                startMic();
+            } else {
+                alert("Galat password hai bro! Yaad karo kya bataya tha?");
+            }
+        }
+
+        function startMic() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function detectBlow() {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    let average = sum / bufferLength;
+
+                    if (average > 50) { 
+                        document.getElementById('flame').classList.add('extinguished');
+                        document.getElementById('instruction').innerText = "🎉 Surprise!!! 🎉";
+                        
+                        // Voice recording play hogi
+                        let voice = document.getElementById('birthday-voice');
+                        voice.play();
+
+                        document.getElementById('next-btn').classList.remove('hidden');
+                    } else {
+                        requestAnimationFrame(detectBlow);
+                    }
+                }
+                detectBlow();
+            })
+            .catch(err => {
+                alert("Browser mein mic permission 'Allow' karein tabhi fook kaam karegi!");
+            });
+        }
+
+        function showFinalWishes() {
+            document.getElementById('wish-page').classList.add('hidden');
+            document.getElementById('final-page').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
